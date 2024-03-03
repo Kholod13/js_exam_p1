@@ -1,0 +1,28 @@
+@import "null_stule.css";
+.img-block {
+  max-width: 80px;
+}
+
+.header .search-block {
+  background-color: honeydew;
+}
+.header .search-block .container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 20px;
+}
+.header .search-block .logo {
+  color: palegreen;
+  font-weight: bold;
+  font-size: 32px;
+}
+.header .search-block .input-group {
+  max-width: 400px;
+}
+.header .search-block .input-group .btn img {
+  max-width: 30px;
+}
