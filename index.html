@@ -21,21 +21,17 @@
                </div>
             </div>          
          </div>
-         <nav class="navbar navbar-expand-lg bg-body-tertiary">
+         <nav class="nav">
             <div class="container">
-               <div class="container-fluid">
-               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-               </button>
-               <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                     <li class="nav-item">
-                     <a class="nav-link active" aria-current="page" href="#">Today</a>
+               <div class="nav-block">
+                  <ul>
+                     <li>
+                        <a class="tab-today" href="#">Today</a>
                      </li>
-                     <li class="nav-item">
-                     <a class="nav-link" href="#">5-day forecast</a>
+                     <li>
+                        <a href="#" class="tab-5-day">5-day forecast</a>
                      </li>
-               </div>
+                  </ul>
                </div>
             </div>
           </nav>
@@ -152,10 +148,107 @@
             </div>
          </div>
          <div class="content--five-days">
-
+            <div class="days-item">
+               <div class="item">
+                  <p class="day">tonight</p>
+                  <p class="date">Jun 30</p>
+                  <img src="img/sun.png" alt="" class="img-block">
+                  <p class="temp">25°C</p>
+               </div>
+               <div class="item">
+                  <p class="day">tonight</p>
+                  <p class="date">Jun 30</p>
+                  <img src="img/sun.png" alt="" class="img-block">
+                  <p class="temp">25°C</p>
+               </div>
+               <div class="item">
+                  <p class="day">tonight</p>
+                  <p class="date">Jun 30</p>
+                  <img src="img/sun.png" alt="" class="img-block">
+                  <p class="temp">25°C</p>
+               </div>
+               <div class="item">
+                  <p class="day">tonight</p>
+                  <p class="date">Jun 30</p>
+                  <img src="img/sun.png" alt="" class="img-block">
+                  <p class="temp">25°C</p>
+               </div>
+               <div class="item">
+                  <p class="day">tonight</p>
+                  <p class="date">Jun 30</p>
+                  <img src="img/sun.png" alt="" class="img-block">
+                  <p class="temp">25°C</p>
+               </div>
+            </div>
+            <div class="hourly-item">
+               <h2 class="title">hourly</h2>
+               <div class="row-items">
+                  <div class="item-description">
+                     <p class="time">TODAY</p>
+                     <p class="forecast">Forecast</p>
+                     <p class="temp">Temp(°C)</p>
+                     <p class="realFeel">RealFeel</p>
+                     <p class="wind">WInd(km/h)</p>
+                  </div>
+                  <div class="item">
+                     <p class="time">7pm</p>
+                     <img class="img-block" src="img/sun.png" alt="">
+                     <p class="forecast">Sunny</p>
+                     <p class="temp">29°C</p>
+                     <p class="realFeel">27°C</p>
+                     <p class="wind">10 ESE</p>
+                  </div>
+                  <div class="item">
+                     <p class="time">7pm</p>
+                     <img class="img-block" src="img/sun.png" alt="">
+                     <p class="forecast">Sunny</p>
+                     <p class="temp">29°C</p>
+                     <p class="realFeel">27°C</p>
+                     <p class="wind">10 ESE</p>
+                  </div>
+                  <div class="item">
+                     <p class="time">7pm</p>
+                     <img class="img-block" src="img/sun.png" alt="">
+                     <p class="forecast">Sunny</p>
+                     <p class="temp">29°C</p>
+                     <p class="realFeel">27°C</p>
+                     <p class="wind">10 ESE</p>
+                  </div>
+                  <div class="item">
+                     <p class="time">7pm</p>
+                     <img class="img-block" src="img/sun.png" alt="">
+                     <p class="forecast">Sunny</p>
+                     <p class="temp">29°C</p>
+                     <p class="realFeel">27°C</p>
+                     <p class="wind">10 ESE</p>
+                  </div>
+                  <div class="item">
+                     <p class="time">7pm</p>
+                     <img class="img-block" src="img/sun.png" alt="">
+                     <p class="forecast">Sunny</p>
+                     <p class="temp">29°C</p>
+                     <p class="realFeel">27°C</p>
+                     <p class="wind">10 ESE</p>
+                  </div>
+                  <div class="item">
+                     <p class="time">7pm</p>
+                     <img class="img-block" src="img/sun.png" alt="">
+                     <p class="forecast">Sunny</p>
+                     <p class="temp">29°C</p>
+                     <p class="realFeel">27°C</p>
+                     <p class="wind">10 ESE</p>
+                  </div>
+               </div>
+            </div>
          </div>
          <div class="content--non-location">
-
+            <div class="item">
+               <img src="img/error-404.png" alt="">
+               <h2 class="message">
+                  <span id="city_message">Qwerty</span> could not be found.<br>
+                  Please eneter a different location.
+               </h2>
+            </div>
          </div>
       </div>
    </div>
