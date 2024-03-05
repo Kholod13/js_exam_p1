@@ -67,7 +67,8 @@
 }
 .content--today .title {
   color: palegreen;
-  font-size: 30px;
+  font-size: 25px;
+  text-transform: uppercase;
 }
 .content--today .date {
   color: palegreen;
@@ -165,5 +166,55 @@
 }
 
 .content--today {
+  display: none;
+}
+
+.content--five-days .title {
+  color: palegreen;
+  font-size: 25px;
+  text-transform: uppercase;
+}
+.content--five-days .days-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  gap: 2px;
+  margin-bottom: 30px;
+}
+.content--five-days .days-item .item {
+  background-color: #F6F6F6;
+  border: none;
+}
+.content--five-days .days-item .item .day {
+  color: #474747;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+.content--five-days .days-item .item .temp {
+  margin-top: 10px;
+}
+.content--five-days .days-item .item:hover {
+  background-color: white;
+}
+.content--five-days .hourly-item {
+  background-color: white;
+  padding: 20px;
+}
+.content--five-days .hourly-item .title {
+  padding-bottom: 10px;
+}
+.content--five-days .hourly-item .row-items {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  text-align: center;
+  color: #474747;
+}
+.content--five-days .hourly-item .row-items .item-description .forecast {
+  margin-top: 96px;
+}
+
+.content--five-days {
   display: none;
 }

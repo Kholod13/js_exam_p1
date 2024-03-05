@@ -62,7 +62,8 @@
    gap: 30px;
    & .title{
       color: palegreen;
-      font-size: 30px;
+      font-size: 25px;
+      text-transform: uppercase;
    }
    & .date{
       color: palegreen;
@@ -152,7 +153,53 @@
 }
 //content five days
 .content--five-days{
-
+   & .title{
+      color: palegreen;
+      font-size: 25px;
+      text-transform: uppercase;
+   }
+   & .days-item{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      gap: 2px;
+      margin-bottom: 30px;
+      & .item{
+         background-color: #F6F6F6;
+         border: none;
+         & .day{
+            color: #474747;
+            margin-top: 10px;
+            text-transform: uppercase;
+         }
+         & .temp{
+            margin-top: 10px;
+         }
+      }
+      & .item:hover{
+         background-color: white;
+      }
+   }
+   & .hourly-item{
+      background-color: white;
+      padding: 20px;
+      & .title{
+         padding-bottom: 10px;
+      }
+      & .row-items{
+         display: flex;
+         justify-content: space-around;
+         text-align: center;
+         color: #474747;
+         & .item-description{
+            & .forecast{
+               margin-top: 96px;
+            }
+         }
+      }
+   }
+}
+.content--five-days{
+   display: none;
 }
 //content non location
 .content--non-location{
