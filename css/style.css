@@ -1,4 +1,8 @@
 @import "null_stule.css";
+html {
+  background-color: #D7D7D7;
+}
+
 .img-block {
   max-width: 80px;
 }
@@ -216,5 +220,20 @@
 }
 
 .content--five-days {
+  display: none;
+}
+
+.content--non-location .item {
+  background-color: #F6F6F6;
+  text-align: center;
+  padding: 20px;
+  border-radius: 20px;
+}
+.content--non-location .item img {
+  height: 300px;
+  margin-bottom: 20px;
+}
+
+.content--non-location {
   display: none;
 }
