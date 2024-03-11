@@ -4,10 +4,39 @@ const contentToday = document.querySelector('.content--today');
 const tab5day = document.querySelector('.tab-5-day');
 const content5Days = document.querySelector('.content--five-days');
 const contentNonLocation = document.querySelector('.content--non-location');
-let userLocation;
+const form_control = document.querySelector('.form-control');
+const btn_search = document.querySelector('.btn-outline-secondary');
+let cities = []; // Пустий масив для зберігання міст
 
-// Виклик функції отримання локації
+// API ключ OpenWeatherMap
+const apiKey = "ecb45209976ad5f0e9e39ee2e77cf00b";
+let locationName;
+let locationData;
+
+
+// Завантаження списку міст після завантаження сторінки
+form_control.value = "";
+loadCityList();
 getLocation();
+
+
+function uploadWetherData(locationName){
+   const url = `https://api.openweathermap.org/data/2.5/weather?q=${locationName}&appid=${apiKey}`;
+
+    // Виконання запиту за допомогою fetch
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            // Отримання погодних даних
+            console.log('Weather Data:', data);
+            // Тут ви можете обробити отримані дані, наприклад, вивести температуру
+            const temperature = data.main.temp;
+            console.log('Temperature:', temperature);
+        })
+        .catch(error => {
+            console.error('Error fetching weather data:', error);
+        });
+}
 
 // Отримання локації користувача
 function getLocation() {
@@ -18,22 +47,55 @@ function getLocation() {
    }
 }
 
-// Показ локації
-function showPosition(position) {
-   userLocation = {
-       latitude: position.coords.latitude,
-       longitude: position.coords.longitude
-   };
-   
-   // Виведення локації для перевірки
-   console.log("Location:", userLocation);
-   // Перевірка наявності локації для відображення вмісту
-   if (userLocation !== undefined) {
-       openTabLocation();
+function getLocationName(latitude, longitude) {
+   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
 
+   fetch(url)
+       .then(response => response.json())
+       .then(data => {
+            locationName = data.name;
+            checkLocation(locationName); // Перевірка наявності міста в списку
+       })
+       .catch(error => {
+           console.error("Error fetching location:", error);
+           alert("Please input your city");
+       });
+}
+
+function showPosition(position) {
+   getLocationName(position.coords.latitude, position.coords.longitude);
+}
+
+// Завантаження файлу city.list.json та обробка його даних
+function loadCityList() {
+   fetch('../scripts/city.list.json') // Завантаження JSON-файлу
+    .then(response => response.json()) // Парсинг вмісту JSON
+    .then(data => {
+        // Перебираємо кожен об'єкт міста і створюємо новий об'єкт з іменем та id
+        cities = data.map(city => ({ id: city.id, name: city.name })); 
+        console.log(cities); // Перевірка, чи додається масив міст правильно
+    })
+    .catch(error => {
+        console.error('Помилка завантаження файлу city.list.json:', error); // Обробка помилок завантаження файлу
+    });
+}
+
+function checkLocation(locationName) {
+   const city = findCityByName(locationName); // Знаходимо об'єкт міста за іменем
+   if (city !== null) {
+       // Місто в списку
+       locationData = { name: locationName, id: city.id }; // Записуємо ім'я та id міста у глобальну змінну locationData
+       openTabLocation();
+       console.log("City Name:", locationName);
+       form_control.value = locationName;
+       uploadWetherData(locationName); // Передача назви міста у функцію uploadWetherData()
    } else {
-       openTabNonLocation();
+       alert("Incorrect name location, please input again");
    }
+}
+
+function findCityByName(cityName) {
+   return cities.find(city => city.name === cityName); // Пошук міста за іменем у масиві cities
 }
 
 // Обробка помилок отримання локації
@@ -64,7 +126,7 @@ function openTabLocation() {
 
 // Обробка кліків на вкладки
 tabToday.addEventListener('click', function() {
-   if (userLocation !== undefined) {
+   if (locationName !== undefined) {
        openTabLocation();
    } else {
        openTabNonLocation();
@@ -72,12 +134,22 @@ tabToday.addEventListener('click', function() {
 });
 
 tab5day.addEventListener('click', function() {
-   if (userLocation !== undefined) {
+   if (locationName !== undefined) {
        content5Days.classList.add('content--active');
        contentToday.classList.remove('content--active');
        contentNonLocation.classList.remove('content--active');
    } else {
        openTabNonLocation();
+   }
+});
+
+btn_search.addEventListener('click', function(){
+   locationName = form_control.value;
+   if (findCityByName(locationName)) {
+       // Місто в списку
+       checkLocation(locationName);
+   } else {
+       alert("Incorrect name location, please input again");
    }
 });
 
