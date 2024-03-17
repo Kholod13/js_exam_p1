@@ -83,6 +83,12 @@ html{
          display: flex;
          justify-content: space-around;
          padding: 20px;
+         & .picture-block{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+         }
          & .img-title{
             margin-top: 10px;
             text-align: center;
