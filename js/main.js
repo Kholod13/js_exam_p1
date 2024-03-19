@@ -10,7 +10,7 @@ let cities = []; // Пустий масив для зберігання міст
 //tab today
 weatherData = [];
 const itemBlocks = document.querySelectorAll('.row-items .item:not(:first-child)');
-
+const nearbyPlacesBlock = document.querySelector('.places-item .items-block');
 // API ключ OpenWeatherMap
 const apiKey = "ecb45209976ad5f0e9e39ee2e77cf00b";
 let locationName;
@@ -22,31 +22,92 @@ form_control.value = "";
 loadCityList();
 getLocation();
 
+
+
+async function getNearestCities(latitude, longitude) {
+   const apiKey = "ecb45209976ad5f0e9e39ee2e77cf00b";
+   const response = await fetch(`https://api.openweathermap.org/data/2.5/find?lat=${latitude}&lon=${longitude}&cnt=4&appid=${apiKey}`);
+   const data = await response.json();
+
+   if (data && data.list && data.list.length > 0) {
+       const nearestCitiesWeather = data.list.map(city => ({
+           name: city.name,
+           temperature: (city.main.temp - 273.15).toFixed(0),
+           weatherIcon: getWeatherIcon(city.weather[0].icon) // Отримуємо іконку погоди
+       }));
+
+       // Оновлюємо HTML з відомостями про найближчі міста
+       const itemsBlock = document.querySelector('.places-item .items-block');
+       itemsBlock.innerHTML = ''; // Очищаємо блок перед оновленням
+
+       nearestCitiesWeather.forEach(cityWeather => {
+           const item = document.createElement('div');
+           item.classList.add('item');
+
+           const cityName = document.createElement('p');
+           cityName.classList.add('city');
+           cityName.textContent = cityWeather.name;
+
+           const info = document.createElement('div');
+           info.classList.add('info');
+
+           const img = document.createElement('img');
+           img.classList.add('mini-img-block');
+           img.src = cityWeather.weatherIcon; // Встановлюємо шлях до зображення погоди
+           img.alt = 'Weather icon';
+
+           const temp = document.createElement('p');
+           temp.classList.add('temp');
+           temp.textContent = `${cityWeather.temperature}°C`;
+
+           info.appendChild(img);
+           info.appendChild(temp);
+
+           item.appendChild(cityName);
+           item.appendChild(info);
+
+           itemsBlock.appendChild(item);
+       });
+
+       console.log(nearestCitiesWeather);
+   } else {
+       throw new Error('No nearest cities found');
+   }
+}
+
+// Функція для отримання шляху до зображення погоди на основі коду погоди
+function getWeatherIcon(weatherCode) {
+    return `https://openweathermap.org/img/w/${weatherCode}.png`;
+}
+
 function setWeatherImage(forecast, selector) {
    const imgBlock = document.querySelector(selector);
    let imagePath = '';
 
    // Обробляємо різні випадки опису погоди
    switch (forecast) {
-       case 'Clear':
+       case 'clear':
        case 'clear sky':
            imagePath = 'img/sun.png';
            break;
-       case 'Clouds':
+       case 'clouds':
        case 'scattered clouds':
        case 'broken clouds':
        case 'overcast clouds':
+       case 'few clouds':
            imagePath = 'img/clouds.png';
            break;
-       case 'Rain':
+       case 'rain':
+       case 'light rain':
            imagePath = 'img/rain.png';
            break;
-       case 'Snow':
-           imagePath = 'img/snow.png';
+       case 'snow':
+       case 'light snow':
+           imagePath = 'img/snowy.png';
            break;
        // Додайте інші випадки, якщо потрібно
        default:
-           imagePath = 'img/default.png';
+           imagePath = 'img/sun.png';
            break;
    }
 
@@ -60,16 +121,40 @@ function getLocation() {
    } else {
        openTabNonLocation();
    }
+
+   async function showPosition(position) {
+       getLocationName(position.coords.latitude, position.coords.longitude);
+       const { latitude, longitude } = position.coords;
+       try {
+           const nearestCities = await getNearestCities(latitude, longitude);
+       } catch (error) {
+           console.error('Error:', error);
+       }
+   }
+}
+
+async function showPosition(position) {
+   getLocationName(position.coords.latitude, position.coords.longitude);
+   const { latitude, longitude } = position.coords;
+
+   // Викликаємо функції, що вимагають значень latitude і longitude
+   try {
+       const nearestCities = await getNearestCities(latitude, longitude);
+       console.log('Nearest cities:', nearestCities);
+   } catch (error) {
+       console.error('Error:', error);
+   }
 }
 
 function getLocationName(latitude, longitude) {
    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
-
+ 
    fetch(url)
        .then(response => response.json())
        .then(data => {
             locationName = data.name;
-            checkLocation(locationName); // Перевірка наявності міста в списку
+            checkLocation(locationName); // Call the function that depends on locationName here
+            // Or move the code that depends on locationName here
        })
        .catch(error => {
            console.error("Error fetching location:", error);
@@ -77,14 +162,10 @@ function getLocationName(latitude, longitude) {
        });
 }
 
-function showPosition(position) {
-   getLocationName(position.coords.latitude, position.coords.longitude);
-}
-
 function checkLocation(locationName) {
    const city = findCityByName(locationName);
    if (city !== null) {
-       locationData = { name: locationName, id: city.id };
+       locationData = { name: locationName, id: city.id, };
        openTabLocation();
        console.log("City Name:", locationName);
        form_control.value = locationName;
@@ -108,8 +189,8 @@ function uploadWeatherDataCurrent(locationName) {
                const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
                const forecast = data.weather[0].description;
                setWeatherImage(forecast, '.main-item .img-block');
-               const temp = (data.main.temp - 273.15).toFixed(1);
-               const realFeel = (data.main.feels_like - 273.15).toFixed(1);
+               const temp = (data.main.temp - 273.15).toFixed(0);
+               const realFeel = (data.main.feels_like - 273.15).toFixed(0);
                const sunrise = new Date(data.sys.sunrise * 1000).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
                const sunset = new Date(data.sys.sunset * 1000).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
                const duration = new Date((data.sys.sunset - data.sys.sunrise) * 1000).toISOString().substr(11, 8);
@@ -151,32 +232,67 @@ function uploadWeatherDataHourly(locationName) {
 
                // Перебираємо список прогнозів погоди для кожної години
                data.list.forEach(hourlyForecast => {
-                   const date = new Date(hourlyForecast.dt * 1000);
-                   const time = `${date.getHours()}:00`;
-                   const forecast = hourlyForecast.weather[0].description;
-                   const temp = (hourlyForecast.main.temp - 273.15).toFixed(1);
-                   const realFeel = (hourlyForecast.main.feels_like - 273.15).toFixed(1);
-                   const wind = hourlyForecast.wind.speed;
+                  const date = new Date(hourlyForecast.dt * 1000);
+                  const time = `${date.getHours()}:00`;
+                  const forecast = hourlyForecast.weather[0].description;
+                  const temp = (hourlyForecast.main.temp - 273.15).toFixed(0);
+                  const realFeel = (hourlyForecast.main.feels_like - 273.15).toFixed(0);
+                  const wind = hourlyForecast.wind.speed;
+                  let imagePath = '';
+              
+                  // Встановлюємо шлях до зображення залежно від прогнозу погоди
+                  switch (forecast) {
+                      case 'clear':
+                      case 'clear sky':
+                          imagePath = 'img/sun.png';
+                          break;
+                      case 'clouds':
+                      case 'scattered clouds':
+                      case 'broken clouds':
+                      case 'overcast clouds':
+                      case 'few clouds':
+                          imagePath = 'img/clouds.png';
+                          break;
+                      case 'rain':
+                        case 'light rain':
+                          imagePath = 'img/rain.png';
+                          break;
+                      case 'snow':
+                      case 'light snow':
+                          imagePath = 'img/snowy.png';
+                          break;
+                      // Додайте інші випадки, якщо потрібно
+                      default:
+                          imagePath = 'img/sun.png';
+                          break;
+                  }
+              
+                  // Додаємо дані до масиву weatherData
+                  weatherData.push({ time, forecast, temp, realFeel, wind, imagePath });
+              });
+              
+              // Відображаємо дані на екрані
+              itemBlocks.forEach((block, index) => {
+                  const currentData = weatherData[index];
+                  const timeElement = block.querySelector('.time');
+                  const forecastElement = block.querySelector('.forecast');
+                  const tempElement = block.querySelector('.temp');
+                  const realFeelElement = block.querySelector('.realFeel');
+                  const windElement = block.querySelector('.wind');
+                  const imgBlock = block.querySelector('.img-block');
+              
+                  timeElement.textContent = currentData.time;
+                  forecastElement.textContent = currentData.forecast;
+                  tempElement.textContent = `${currentData.temp}°C`;
+                  realFeelElement.textContent = `${currentData.realFeel}°C`;
+                  windElement.textContent = `${currentData.wind} m/s`;
+              
+                  // Встановлюємо шлях до зображення погоди для кожного блоку
+                  imgBlock.src = currentData.imagePath;
+              });
+              
+              
 
-                   // Додаємо дані до масиву weatherData
-                   weatherData.push({ time, forecast, temp, realFeel, wind });
-               });
-
-               // Відображаємо дані на екрані
-               itemBlocks.forEach((block, index) => {
-                   const currentData = weatherData[index];
-                   const timeElement = block.querySelector('.time');
-                   const forecastElement = block.querySelector('.forecast');
-                   const tempElement = block.querySelector('.temp');
-                   const realFeelElement = block.querySelector('.realFeel');
-                   const windElement = block.querySelector('.wind');
-
-                   timeElement.textContent = currentData.time;
-                   forecastElement.textContent = currentData.forecast;
-                   tempElement.textContent = `${currentData.temp}°C`;
-                   realFeelElement.textContent = `${currentData.realFeel}°C`;
-                   windElement.textContent = `${currentData.wind} m/s`;
-               });
            } else {
                console.error('Error fetching weather data: No weather information available');
            }
@@ -185,8 +301,6 @@ function uploadWeatherDataHourly(locationName) {
            console.error('Error fetching weather data:', error);
        });
 }
-
-
 
 // Завантаження файлу city.list.json та обробка його даних
 function loadCityList() {
@@ -201,7 +315,6 @@ function loadCityList() {
         console.error('Помилка завантаження файлу city.list.json:', error); // Обробка помилок завантаження файлу
     });
 }
-
 
 function findCityByName(cityName) {
    return cities.find(city => city.name === cityName); // Пошук міста за іменем у масиві cities
@@ -252,11 +365,22 @@ tab5day.addEventListener('click', function() {
    }
 });
 
-btn_search.addEventListener('click', function(){
+btn_search.addEventListener('click', async function(){
    locationName = form_control.value;
    if (findCityByName(locationName)) {
        // Місто в списку
        checkLocation(locationName);
+
+       // Викликаємо функцію getNearestCities з новоотриманими координатами
+       try {
+           const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${locationName}&appid=${apiKey}`);
+           const data = await response.json();
+           const latitude = data.coord.lat;
+           const longitude = data.coord.lon;
+           await getNearestCities(latitude, longitude);
+       } catch (error) {
+           console.error('Error:', error);
+       }
    } else {
        alert("Incorrect name location, please input again");
    }
