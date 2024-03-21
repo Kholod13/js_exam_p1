@@ -313,7 +313,7 @@ function loadCityList() {
 }
 //search city by name
 function findCityByName(cityName) {
-   return cities.find(city => city.name === cityName); // Пошук міста за іменем у масиві cities
+   return cities.find(city => city.name === cityName);
 }
 //func for error
 function showError(error) {
@@ -361,10 +361,7 @@ tab5day.addEventListener('click', function() {
 btn_search.addEventListener('click', async function(){
    locationName = form_control.value;
    if (findCityByName(locationName)) {
-       // Місто в списку
        checkLocation(locationName);
-
-       // Викликаємо функцію getNearestCities з новоотриманими координатами
        try {
            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${locationName}&appid=${apiKey}`);
            const data = await response.json();
