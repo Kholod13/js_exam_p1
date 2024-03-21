@@ -1,29 +1,29 @@
-// Отримання посилань на елементи
+// links to tabs
 const tabToday = document.querySelector('.tab-today');
 const contentToday = document.querySelector('.content--today');
 const tab5day = document.querySelector('.tab-5-day');
 const content5Days = document.querySelector('.content--five-days');
 const contentNonLocation = document.querySelector('.content--non-location');
+//search form
 const form_control = document.querySelector('.form-control');
 const btn_search = document.querySelector('.btn-outline-secondary');
-let cities = []; // Пустий масив для зберігання міст
+//empty array for save cities
+let cities = [];
 //tab today
 weatherData = [];
 const itemBlocks = document.querySelectorAll('.row-items .item:not(:first-child)');
 const nearbyPlacesBlock = document.querySelector('.places-item .items-block');
-// API ключ OpenWeatherMap
+// API key OpenWeatherMap
 const apiKey = "ecb45209976ad5f0e9e39ee2e77cf00b";
 let locationName;
 let locationData;
-
-
-// Завантаження списку міст після завантаження сторінки
+// start processes
 form_control.value = "";
 loadCityList();
 getLocation();
 
 
-
+//update info for nearest cities
 async function getNearestCities(latitude, longitude) {
    const apiKey = "ecb45209976ad5f0e9e39ee2e77cf00b";
    const response = await fetch(`https://api.openweathermap.org/data/2.5/find?lat=${latitude}&lon=${longitude}&cnt=4&appid=${apiKey}`);
@@ -33,12 +33,10 @@ async function getNearestCities(latitude, longitude) {
        const nearestCitiesWeather = data.list.map(city => ({
            name: city.name,
            temperature: (city.main.temp - 273.15).toFixed(0),
-           weatherIcon: getWeatherIcon(city.weather[0].icon) // Отримуємо іконку погоди
+           weatherIcon: getWeatherIcon(city.weather[0].icon)
        }));
-
-       // Оновлюємо HTML з відомостями про найближчі міста
        const itemsBlock = document.querySelector('.places-item .items-block');
-       itemsBlock.innerHTML = ''; // Очищаємо блок перед оновленням
+       itemsBlock.innerHTML = '';
 
        nearestCitiesWeather.forEach(cityWeather => {
            const item = document.createElement('div');
@@ -53,7 +51,7 @@ async function getNearestCities(latitude, longitude) {
 
            const img = document.createElement('img');
            img.classList.add('mini-img-block');
-           img.src = cityWeather.weatherIcon; // Встановлюємо шлях до зображення погоди
+           img.src = cityWeather.weatherIcon;
            img.alt = 'Weather icon';
 
            const temp = document.createElement('p');
@@ -74,12 +72,11 @@ async function getNearestCities(latitude, longitude) {
        throw new Error('No nearest cities found');
    }
 }
-
-// Функція для отримання шляху до зображення погоди на основі коду погоди
+// func change weather icon from openWeather
 function getWeatherIcon(weatherCode) {
     return `https://openweathermap.org/img/w/${weatherCode}.png`;
 }
-
+// func change weather icon
 function setWeatherImage(forecast, selector) {
    const imgBlock = document.querySelector(selector);
    let imagePath = '';
@@ -114,7 +111,7 @@ function setWeatherImage(forecast, selector) {
    // Присвоюємо шлях до картинки зображенню
    imgBlock.src = imagePath;
 }
-
+//get browser location
 function getLocation() {
    if (navigator.geolocation) {
        navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -132,7 +129,7 @@ function getLocation() {
        }
    }
 }
-
+//show current user position
 async function showPosition(position) {
    getLocationName(position.coords.latitude, position.coords.longitude);
    const { latitude, longitude } = position.coords;
@@ -145,7 +142,7 @@ async function showPosition(position) {
        console.error('Error:', error);
    }
 }
-
+//get location name
 function getLocationName(latitude, longitude) {
    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
  
@@ -161,7 +158,7 @@ function getLocationName(latitude, longitude) {
            alert("Please input your city");
        });
 }
-
+//func check location
 function checkLocation(locationName) {
    const city = findCityByName(locationName);
    if (city !== null) {
@@ -176,7 +173,7 @@ function checkLocation(locationName) {
        alert("Incorrect name location, please input again");
    }
 }
-
+//current weather
 function uploadWeatherDataCurrent(locationName) {
    const apiKey = 'ecb45209976ad5f0e9e39ee2e77cf00b';
    const url = `https://api.openweathermap.org/data/2.5/weather?q=${locationName}&appid=${apiKey}`;
@@ -218,7 +215,7 @@ function uploadWeatherDataCurrent(locationName) {
            console.error('Error fetching weather data:', error);
        });
 }
-
+//hourly weather
 function uploadWeatherDataHourly(locationName) {
    const apiKey = 'ecb45209976ad5f0e9e39ee2e77cf00b';
    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${locationName}&appid=${apiKey}`;
@@ -301,8 +298,7 @@ function uploadWeatherDataHourly(locationName) {
            console.error('Error fetching weather data:', error);
        });
 }
-
-// Завантаження файлу city.list.json та обробка його даних
+// download file city.list.json
 function loadCityList() {
    fetch('../scripts/city.list.json') // Завантаження JSON-файлу
     .then(response => response.json()) // Парсинг вмісту JSON
@@ -315,12 +311,11 @@ function loadCityList() {
         console.error('Помилка завантаження файлу city.list.json:', error); // Обробка помилок завантаження файлу
     });
 }
-
+//search city by name
 function findCityByName(cityName) {
    return cities.find(city => city.name === cityName); // Пошук міста за іменем у масиві cities
 }
-
-// Обробка помилок отримання локації
+//func for error
 function showError(error) {
    switch(error.code) {
        case error.PERMISSION_DENIED:
@@ -338,15 +333,13 @@ function showError(error) {
    }
    openTabNonLocation();
 }
-
-// Відкриття вкладки з локацією
+//tab location
 function openTabLocation() {
    contentToday.classList.add('content--active');
    content5Days.classList.remove('content--active');
    contentNonLocation.classList.remove('content--active');
 }
-
-// Обробка кліків на вкладки
+//clicks
 tabToday.addEventListener('click', function() {
    if (locationName !== undefined) {
        openTabLocation();
@@ -385,10 +378,14 @@ btn_search.addEventListener('click', async function(){
        alert("Incorrect name location, please input again");
    }
 });
-
-// Відкриття вкладки без локації
+// tab non location
 function openTabNonLocation() {
    contentNonLocation.classList.add('content--active');
    content5Days.classList.remove('content--active');
    contentToday.classList.remove('content--active');
 }
+//5 day forecast
+
+
+
+//save search history
