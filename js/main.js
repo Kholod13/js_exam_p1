@@ -13,6 +13,8 @@ let cities = [];
 weatherData = [];
 const itemBlocks = document.querySelectorAll('.row-items .item:not(:first-child)');
 const nearbyPlacesBlock = document.querySelector('.places-item .items-block');
+//tab five days
+const daysItem = document.querySelectorAll('.days-item .item');
 // API key OpenWeatherMap
 const apiKey = "ecb45209976ad5f0e9e39ee2e77cf00b";
 let locationName;
@@ -353,6 +355,7 @@ tab5day.addEventListener('click', function() {
        content5Days.classList.add('content--active');
        contentToday.classList.remove('content--active');
        contentNonLocation.classList.remove('content--active');
+       uploadWeatherDataForDays(locationName, "23_03_2024");
    } else {
        openTabNonLocation();
    }
@@ -383,6 +386,161 @@ function openTabNonLocation() {
 }
 //5 day forecast
 
+//uploadWeatherDataHourlyFiveDays
+async function uploadWeatherDataForDays(locationName, date) {
+   const apiKey = 'ecb45209976ad5f0e9e39ee2e77cf00b';
+   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${locationName}&appid=${apiKey}`;
 
+   try {
+       const response = await fetch(url);
+       const data = await response.json();
 
-//save search history
+       if (data.list && data.list.length > 0) {
+           const daysOfWeekNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+           // Очищаємо масив weatherData перед додаванням нових даних
+           weatherData.length = 0;
+
+           // Перебираємо список прогнозів погоди для кожної дати
+           data.list.forEach(dayForecast => {
+               const forecastDate = new Date(dayForecast.dt * 1000);
+               const forecastDateString = forecastDate.toISOString().split('T')[0];
+
+               // Перевіряємо, чи співпадає дата прогнозу з вказаною датою
+               if (forecastDateString === date) {
+                   const time = `${forecastDate.getHours()}:00`;
+                   const forecast = dayForecast.weather[0].description;
+                   const temp = (dayForecast.main.temp - 273.15).toFixed(0);
+                   const realFeel = (dayForecast.main.feels_like - 273.15).toFixed(0);
+                   const wind = dayForecast.wind.speed;
+                   const imagePath = getImagePath(forecast); // Отримати шлях до зображення залежно від прогнозу погоди
+
+                   // Додаємо дані до масиву weatherData
+                   weatherData.push({ time, forecast, temp, realFeel, wind, imagePath });
+               }
+           });
+
+           // Відображаємо дані на екрані
+           itemBlocks.forEach((block, index) => {
+               const currentData = weatherData[index];
+               const timeElement = block.querySelector('.time');
+               const forecastElement = block.querySelector('.forecast');
+               const tempElement = block.querySelector('.temp');
+               const realFeelElement = block.querySelector('.realFeel');
+               const windElement = block.querySelector('.wind');
+               const imgBlock = block.querySelector('.img-block');
+
+               timeElement.textContent = currentData.time;
+               forecastElement.textContent = currentData.forecast;
+               tempElement.textContent = `${currentData.temp}°C`;
+               realFeelElement.textContent = `${currentData.realFeel}°C`;
+               windElement.textContent = `${currentData.wind} m/s`;
+
+               // Встановлюємо шлях до зображення погоди для кожного блоку
+               imgBlock.src = currentData.imagePath;
+           });
+
+           // Отримуємо кнопки для кожного дня
+           const daysButtons = document.querySelectorAll('.days-item .item');
+
+           // Знайти кнопку для суботи і виконати потрібні дії
+           const saturdayButton = Array.from(daysButtons).find(button => button.querySelector('.day').textContent === 'Saturday');
+
+           if (saturdayButton) {
+               // Тут ви можете виконати будь-які потрібні дії з кнопкою для суботи
+               // Наприклад, ви можете додати клас до неї
+               saturdayButton.classList.add('saturday-highlight');
+           } else {
+               console.error('Saturday button not found');
+           }
+
+       } else {
+           console.error('Error fetching weather data: No weather information available');
+       }
+   } catch (error) {
+       console.error('Error fetching weather data:', error);
+   }
+}
+
+//hourly
+function uploadWeatherDataHourlyFiveDays(locationName, date) {
+   const apiKey = 'ecb45209976ad5f0e9e39ee2e77cf00b';
+   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${locationName}&appid=${apiKey}`;
+
+   fetch(url)
+       .then(response => response.json())
+       .then(data => {
+           if (data.list && data.list.length > 0) {
+               // Очищаємо масив weatherData перед додаванням нових даних
+               weatherData.length = 0;
+
+               // Перебираємо список прогнозів погоди для кожної години
+               data.list.forEach(hourlyForecast => {
+                   const forecastDate = new Date(hourlyForecast.dt * 1000);
+                   const forecastDateString = forecastDate.toISOString().split('T')[0];
+
+                   // Перевіряємо, чи співпадає дата прогнозу з вказаною датою
+                   if (forecastDateString === date) {
+                       const time = `${forecastDate.getHours()}:00`;
+                       const forecast = hourlyForecast.weather[0].description;
+                       const temp = (hourlyForecast.main.temp - 273.15).toFixed(0);
+                       const realFeel = (hourlyForecast.main.feels_like - 273.15).toFixed(0);
+                       const wind = hourlyForecast.wind.speed;
+                       const imagePath = getImagePath(forecast); // Отримати шлях до зображення залежно від прогнозу погоди
+
+                       // Додаємо дані до масиву weatherData
+                       weatherData.push({ time, forecast, temp, realFeel, wind, imagePath });
+                   }
+               });
+
+               // Відображаємо дані на екрані
+               itemBlocks.forEach((block, index) => {
+                   const currentData = weatherData[index];
+                   const timeElement = block.querySelector('.time');
+                   const forecastElement = block.querySelector('.forecast');
+                   const tempElement = block.querySelector('.temp');
+                   const realFeelElement = block.querySelector('.realFeel');
+                   const windElement = block.querySelector('.wind');
+                   const imgBlock = block.querySelector('.img-block');
+
+                   timeElement.textContent = currentData.time;
+                   forecastElement.textContent = currentData.forecast;
+                   tempElement.textContent = `${currentData.temp}°C`;
+                   realFeelElement.textContent = `${currentData.realFeel}°C`;
+                   windElement.textContent = `${currentData.wind} m/s`;
+
+                   // Встановлюємо шлях до зображення погоди для кожного блоку
+                   imgBlock.src = currentData.imagePath;
+               });
+
+           } else {
+               console.error('Error fetching weather data: No weather information available');
+           }
+       })
+       .catch(error => {
+           console.error('Error fetching weather data:', error);
+       });
+}
+// Функція для отримання шляху до зображення залежно від прогнозу погоди
+function getImagePath(forecast) {
+   switch (forecast) {
+       case 'clear':
+       case 'clear sky':
+           return 'img/sun.png';
+       case 'clouds':
+       case 'scattered clouds':
+       case 'broken clouds':
+       case 'overcast clouds':
+       case 'few clouds':
+           return 'img/clouds.png';
+       case 'rain':
+       case 'light rain':
+           return 'img/rain.png';
+       case 'snow':
+       case 'light snow':
+           return 'img/snowy.png';
+       // Додайте інші випадки, якщо потрібно
+       default:
+           return 'img/sun.png';
+   }
+}
